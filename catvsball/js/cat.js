@@ -1,3 +1,31 @@
+/*
+
+Licence :
+
+Attribution-NonCommercial-NoDerivs 
+CC BY-NC-ND
+
+This license is the most restrictive of our six main licenses, 
+only allowing others to download your works and share them with 
+others as long as they credit you, but they canâ€™t change them 
+in any way or use them commercially.
+
+https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+///////// 
+this cat is used in an other commercial project, a mobile app called :
+"Babel, the cat who would be king"
+http://babeltheking.com/
+
+I did this app with the epic agency team (epic.net)
+Do not use the cat (combination of the shapes, colors, 
+proportions of the cat) with no permission.
+For more info, please contact me at karim@epic.net
+Thanks!
+
+*/
+
+
 Cat = function(){
   this.threeGroup = new THREE.Group();
   
@@ -490,65 +518,65 @@ Cat = function(){
   } );
 }
 
-Cat.prototype.updateTail = function(t) {
-    for(var i = 0; i < this.tailNSegs; i++){
-        var angleStep = -i * .5;
-        var angleAmp = Math.PI / (30/(i+1));
-        
-        var rotZ = Math.sin(t + angleStep) * angleAmp;
-        var st = this.tailSegements[i];
-        st.rotation.z = rotZ;
-    }
+Cat.prototype.updateTail = function(t){
+  
+  for (var i=0; i<this.tailNSegs; i++){
+    var angleStep = -i*.5;
+    var angleAmp = Math.PI/(30/(i+1));
+
+    var rotZ = Math.sin(t+angleStep)*angleAmp;
+    var st = this.tailSegements[i];
+    st.rotation.z = rotZ;//(rotY * i);
+  }
 }
 
 Cat.prototype.interactWithBall = function(ballPos){
-    var bDir = ballPos.clone().sub(this.shouldersPosition.clone());
-    var isInDistance = bDir.length() < (this.armHeight*2 + this.handHeight + 8) * 1.3;
-    
-    this.lookAt(ballPos);
-    
-    this.transferPower.x *= .8;
-    this.transferPower.y *= .8;
-    
-    if (! this.isAttacking){
-        if(! isInDistance){
-            if(! this.isFootReplacing){
-                this.isFootReplacing = true;
-                this.replaceFoot(this.footUsed);
-            }
-        }else{
-            this.lookAt(ballPos);
-            if (Math.random()>.96 ){
-                this.isAttacking = true;
-                this.isFootReplacing = false;
-                this.attack(this.footUsed, ballPos, bDir);
-            }else{
-                this.isFootReplacing = false;
-                var middleVector = this.shouldersPosition.clone().add(bDir.clone().multiplyScalar(.4));
-                this.prepareAttack(this.footUsed, middleVector);
-            }
-        }
-    }
-    
-    if (!this.isBlinking && Math.random()>.99){
-        this.isBlinking = true;
-        this.blink();
-    }
+  var bDir = ballPos.clone().sub(this.shouldersPosition.clone());
+  var isInDistance = bDir.length() < (this.armHeight*2 + this.handHeight + 8)*1.3;
 
-    if (!this.mouthMoving && Math.random()>.99){
-        this.mouthMoving = true;
-        this.moveMouth();
+  this.lookAt(ballPos);
+
+  this.transferPower.x *= .8;
+  this.transferPower.y *= .8;
+
+  if (! this.isAttacking){
+    if (! isInDistance){
+      if (!this.isFootReplacing ){
+        this.isFootReplacing = true;
+        this.replaceFoot(this.footUsed);
+      }
+    }else{
+      this.lookAt(ballPos);
+      if (Math.random()>.96 ){
+        this.isAttacking = true;
+        this.isFootReplacing = false;
+        this.attack(this.footUsed, ballPos, bDir);
+      }else{
+        this.isFootReplacing = false;
+        var middleVector = this.shouldersPosition.clone().add(bDir.clone().multiplyScalar(.4));
+        this.prepareAttack(this.footUsed, middleVector);
+      }
     }
+  }
+
+
+  if (!this.isBlinking && Math.random()>.99){
+    this.isBlinking = true;
+    this.blink();
+  }
+
+  if (!this.mouthMoving && Math.random()>.99){
+    this.mouthMoving = true;
+    this.moveMouth();
+  }
 }
 
-Cat.prototype.lookAt = function(v) {
-    if (!this.oldTargetLookPos){
-        this.oldTargetLookPos = new THREE.Vector3();
-    }
-    this.newTargetLookPos = v.clone();
-    this.lookPos = this.oldTargetLookPos.clone().add(this.newTargetLookPos.sub(this.oldTargetLookPos).multiplyScalar(.15));
-    this.head.lookAt(this.lookPos);
-    this.oldTargetLookPos = this.lookPos;
+Cat.prototype.lookAt = function(v){
+  if (!this.oldTargetLookPos)this.oldTargetLookPos = new THREE.Vector3();
+  this.newTargetLookPos = v.clone();
+  this.lookPos = this.oldTargetLookPos.clone().add(this.newTargetLookPos.sub(this.oldTargetLookPos).multiplyScalar(.15));
+  this.head.lookAt(this.lookPos);
+  this.oldTargetLookPos = this.lookPos;
 }
 
 Cat.prototype.prepareAttack = function(side, v){
@@ -657,3 +685,4 @@ function getAngles(targetPos, shoulderPos, segmentLength){
 
   return {theta:theta, alpha:-alpha0, beta:-beta0};
 }
+127.0.0.1

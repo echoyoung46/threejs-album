@@ -6,8 +6,7 @@ var scene,
     gobalLight, shadowLight, backLight,
     renderer,
     container,
-    controls,
-    trackballControls,clock;
+    controls;
 
 //SCREEN & MOUSE VARIABLES
 
@@ -24,7 +23,6 @@ var hero;
 //INIT THREE JS, SCREEN AND MOUSE EVENTS
 
 function initScreenAnd3D() {
-  clock = new THREE.Clock();
   
   HEIGHT = window.innerHeight;
   WIDTH = window.innerWidth;
@@ -51,13 +49,6 @@ function initScreenAnd3D() {
   renderer.setSize(WIDTH, HEIGHT);
   renderer.shadowMapEnabled = true;
   
-//   trackballControls = new THREE.TrackballControls(camera);
-  
-//   trackballControls.rotateSpeed = 1.0;
-//   trackballControls.zoomSpeed = 1.0;
-//   trackballControls.panSpeed = 1.0;
-//   trackballControls.staticMoving = true;
-    
   container = document.getElementById('world');
   container.appendChild(renderer.domElement);
   
@@ -65,13 +56,13 @@ function initScreenAnd3D() {
   document.addEventListener('mousemove', handleMouseMove, false);
   document.addEventListener('touchmove', handleTouchMove, false);
   
-  
+  /*
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.minPolarAngle = -Math.PI / 2; 
   controls.maxPolarAngle = Math.PI / 2;
   controls.noZoom = true;
   controls.noPan = true;
- 
+  //*/
 
 
 }
@@ -239,7 +230,7 @@ Ball = function(){
 
   	this.threeGroup.add(this.string);
 	this.threeGroup.add(this.body);
-    
+
 	this.threeGroup.traverse( function ( object ) {
     if ( object instanceof THREE.Mesh ) {
       object.castShadow = true;
@@ -431,15 +422,8 @@ function getBallPos(){
 }
 
 function render(){
-//   var delta = clock.getDelta();
-  
-//   if (controls) controls.update();
-  
-//   trackballControls.update(delta);
-//   requestAnimationFrame(render);
-    if(controls) controls.update();
-  
-    renderer.render(scene, camera);
+  if (controls) controls.update();
+  renderer.render(scene, camera);
 }
 
 window.addEventListener('load', init, false);

@@ -1,0 +1,304 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+        <script src="../libs/jquery-1.9.0.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.4/TweenMax.min.js"></script>
+        <script src="http://threejs.org/build/three.min.js"></script>
+		<script src="http://threejs.org/examples/js/libs/tween.min.js"></script>
+		<script src="http://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
+        <style>
+            html, body {
+				height: 100%;
+			}
+
+			body {
+				background-color: #000000;
+				/*background: url("http://2.bp.blogspot.com/_iDw_WfSYvrQ/TMefEO5SIBI/AAAAAAAAABo/1u_sE1Fml4A/s1600/007%20Squirtle.png");*/
+				margin: 0;
+				font-family: Helvetica, sans-serif;;
+				overflow: hidden;
+			}
+
+			.text {
+				font-size: 5em;
+				color: #ccc;
+				font-family: Year supply of fairy cakes, Segoe UI;
+				position: absolute;
+				left: 40%;
+				margin-top: 80px;
+			}
+			
+			#info {
+				position: absolute;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				font-weight: bold;
+				text-align: center;
+				z-index: 1;
+			}
+
+			#container {
+				opacity: 0.5;
+			}
+			
+			.element {
+				width: 120px;
+				height: 120px;
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+				border: 1px solid rgba(127,255,255,0.25);
+				text-align: center;
+				cursor: default;
+			}
+
+			.element:hover {
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+				border: 1px solid rgba(127,255,255,0.75);
+			}
+
+            .element .number {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 12px;
+                color: rgba(127,255,255,0.75);
+            }
+
+            .element .symbol {
+                position: absolute;
+                top: 40px;
+                left: 0px;
+                right: 0px;
+                font-size: 60px;
+                font-weight: bold;
+                color: rgba(255,255,255,0.75);
+                text-shadow: 0 0 10px rgba(0,255,255,0.95);
+            }
+
+            .element .details {
+                position: absolute;
+                bottom: 15px;
+                left: 0px;
+                right: 0px;
+                font-size: 12px;
+                color: rgba(127,255,255,0.75);
+            }
+        </style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<!--<div id="datext"><span class="text">Periodic.</span></div>-->
+    <script>
+        $(document).ready(function() {
+            // window.tl = new TimelineLite({
+            //     paused: true,
+            //     onStart: function() {
+            //         $(".text").show();
+            //     }
+            // });
+            
+            // $(".text").hide();
+            
+            // tl
+            //     .set($("#datext"), {autoAlpha: 0})
+            //     .to($("#datext"), 5, {scale: 3, transformOrigin: "50% 50%"}, 0)
+            //     .to($("#datext"), 2, {autoAlpha: 1}, 1);
+				 
+			var table = [
+                //M
+				"M1", "Strontium", "87.62", 1, 5,
+				"M2", "Yttrium", "88.90585", 2, 5,
+				"M3", "Zirconium", "91.224", 3, 5,
+				"M4", "Niobium", "92.90628", 4, 5,
+				"M5", "Molybdenum", "95.96", 5, 5,
+                "M6", "Barium", "132.9054", 1, 6,
+				"M7", "Hafnium", "178.49", 3, 6,
+				"M8", "Tungsten", "183.84", 5, 6,
+                "M9", "Radium", "(226)", 1, 7,
+				"M10", "Rutherfordium", "(267)", 3, 7,
+				"M11", "Seaborgium", "(271)", 5, 7,
+                "M12", "Radium", "(226)", 1, 8,
+				"M13", "Rutherfordium", "(267)", 3, 8,
+				"M14", "Seaborgium", "(271)", 5, 8,
+                "M15", "Radium", "(226)", 1, 9,
+				"M16", "Rutherfordium", "(267)", 3, 9,
+				"M17", "Seaborgium", "(271)", 5, 9,
+                
+                //E
+                "E1", "Ruthenium", "101.07", 7, 5,
+				"E2", "Rhodium", "102.9055", 8, 5,
+				"E3", "Palladium", "106.42", 9, 5,
+                "E4", "Osmium", "190.23", 7, 6,
+                "E5", "Hassium", "(270)", 7, 7,
+				"E6", "Meitnerium", "(276)", 8, 7,
+				"E7", "Darmstadium", "(281)", 9, 7,
+                "E8", "Osmium", "190.23", 7, 8,
+                "E9", "Hassium", "(270)", 7, 9,
+				"E10", "Meitnerium", "(276)", 8, 9,
+				"E11", "Darmstadium", "(281)", 9, 9,
+                
+                //I
+				"I1", "Cadmium", "112.411", 11, 5,
+                "I2", "Mercury", "200.59", 11, 6,
+				"I3", "Indium", "114.818", 11, 7,
+                "I4", "Indium", "114.818", 11, 8,
+                "I5", "Indium", "114.818", 11, 9,
+                
+                
+                //Z
+                "Z1", "Tin", "118.71", 13, 5,
+				"Z2", "Antimony", "121.76", 14, 5,
+				"Z3", "Tellurium", "127.6", 15, 5,
+                "Z4", "Bismuth", "208.9804", 15, 6,
+				"Z6", "Ununpentium", "(288)", 14, 7,
+				"Z7", "Livermorium", "(293)", 13, 8,
+				"Z7", "Livermorium", "(293)", 13, 9,
+				"Z7", "Livermorium", "(293)", 14, 9,
+				"Z7", "Livermorium", "(293)", 15, 9,
+                
+                //U
+                "U1", "Iodine", "126.90447", 17, 5,
+				"U2", "Astatine", "(210)", 17, 6,
+				"U3", "Ununseptium", "(294)", 17, 7,
+				"U4", "Ununseptium", "(294)", 17, 8,
+				"U5", "Ununseptium", "(294)", 17, 9,
+                "U6", "Ununseptium", "(294)", 18, 9,
+				"U7", "Xenon", "131.293", 19, 9,
+				"U8", "Radon", "(222)", 19, 8,
+				"U9", "Ununoctium", "(294)", 19, 7,		
+				"U10", "Ununoctium", "(294)", 19, 6,		
+				"U11", "Ununoctium", "(294)", 19, 5		
+				
+			];
+
+			var camera, scene, renderer;
+			var controls;
+
+			var objects = [];
+			var targets = { table: []};
+
+			function repeat() {
+				clearScreen();
+				// tl.restart();
+				init()
+				animate();
+				setTimeout( function () {
+					repeat();
+				}, 6000);
+			}
+			repeat();
+				
+			function init() {
+				camera = null;
+				scene = null;
+				objects = [];
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 600 );
+				camera.position.z = 3000;
+
+				scene = new THREE.Scene();
+
+				// table
+
+				for ( var i = 0; i < table.length; i += 5 ) {
+					var element = document.createElement( 'div' );
+					element.className = 'element';
+					element.style.backgroundColor = 'rgba(123,27,200,' + ( Math.random() * 0.5 + 0.25 ) + ')';
+					// element.style.backgroundColor = "#"+((1<<24)*Math.random()|0).toString(16);
+
+					var number = document.createElement( 'div' );
+					number.className = 'number';
+					number.textContent = (i/5) + 1;
+					element.appendChild( number );
+
+					var symbol = document.createElement( 'div' );
+					symbol.className = 'symbol';
+					symbol.textContent = table[ i ];
+					element.appendChild( symbol );
+
+					// var details = document.createElement( 'div' );
+					// details.className = 'details';
+					// details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
+					// element.appendChild( details );
+
+					var object = new THREE.CSS3DObject( element );
+					object.position.x = Math.random() * 4000 - 2000;
+					object.position.y = Math.random() * 2000 - 1000;
+					//object.position.z = Math.random() * 4000 - 2000;
+					scene.add( object );
+
+					objects.push( object );
+
+					var object = new THREE.Object3D();
+					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
+					object.position.y = - ( table[ i + 4 ] * 140 ) + 1190;
+
+					targets.table.push( object );
+				}
+
+				renderer = new THREE.CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.domElement.style.position = 'absolute';
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				transform( targets.table, 2000 );
+				
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function transform( targets, duration ) {
+				TWEEN.removeAll();
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+					var target = targets[ i ];
+
+					new TWEEN.Tween( object.position )
+						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+					/*new TWEEN.Tween( object.rotation )
+						.to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();*/
+				}
+
+				new TWEEN.Tween( this )
+					.to( {}, duration * 2 )
+					.onUpdate( render )
+					.start();
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				render();
+			}
+
+			function animate() {
+				setTimeout( function() {
+					requestAnimationFrame( animate );
+					TWEEN.update();
+				}, 120);
+			}
+
+			function render() {
+				renderer.render( scene, camera );
+			}
+
+			function clearScreen() {
+				//document.getElementById("container").innerHTML = "";;
+				var node = document.getElementById("container");
+				while (node.firstChild) {
+					node.removeChild(node.firstChild);
+				}
+			}
+        });
+    </script>
+	</body>
+</html>

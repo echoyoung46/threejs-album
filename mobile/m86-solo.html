@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>m86 solo</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/ColladaLoader.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script src="../libs/OrbitControls.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var webGLRenderer = new THREE.WebGLRenderer();
+        webGLRenderer.setClearColor(new THREE.Color(0xcccccc, 1.0));
+        webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+        webGLRenderer.shadowMapEnabled = true;
+
+        // position and point the camera to the center of the scene
+        camera.position.x = 150;
+        camera.position.y = 150;
+        camera.position.z = 150;
+        camera.lookAt(new THREE.Vector3(0, 20, 0));
+
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(150, 150, 150);
+        spotLight.intensity = 2;
+        scene.add(spotLight);
+
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
+
+        // model from http://www.thingiverse.com/thing:69709
+        var loader = new THREE.ColladaLoader();
+        var mesh = null;
+
+        loader.load("./models/m80/m80_dae.dae", function (result) {
+            var geom = result.scene.children[0].children[0].geometry;
+
+            var texture = THREE.ImageUtils.loadTexture('models/m80/m80_map.jpg', {}, function() {
+                var mat = new THREE.MeshLambertMaterial();
+                mat.map = texture;
+                mesh = new THREE.Mesh(geom, mat);
+                mesh.scale.set(0.3, 0.3, 0.3);
+                
+                scene.add(mesh);                
+                render();
+            });
+        });
+
+        /*loader.load("./m80/m80_dae.dae", function (result) {
+
+            var geom = result.scene.children[0].children[0].geometry;
+
+            var texture = THREE.ImageUtils.loadTexture('m80/m80_map.jpg', {}, function() {
+                var mat = new THREE.MeshLambertMaterial();
+                mat.map = texture;
+                var mesh = new THREE.Mesh(geom, mat);
+                scene.add(mesh);                
+            });
+
+            render();
+        });*/
+
+        var orbitControls = new THREE.OrbitControls(camera);
+        orbitControls.autoRotate = true;
+        var clock = new THREE.Clock();
+
+        function render() {
+            stats.update();
+
+            var delta = clock.getDelta();
+            orbitControls.update(delta);
+            
+            mesh.rotation.x += 0.01;
+            mesh.rotation.y += 0.01;
+            mesh.rotation.z += 0.01;
+
+            // render using requestAnimationFrame
+            requestAnimationFrame(render);
+            webGLRenderer.render(scene, camera);
+
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>

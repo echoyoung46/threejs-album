@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>m86</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/ColladaLoader.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script src="../libs/OrbitControls.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+        // create a render and set the size
+        var webGLRenderer = new THREE.WebGLRenderer();
+        webGLRenderer.setClearColor(new THREE.Color(0x000, 1.0));
+        webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+        webGLRenderer.shadowMapEnabled = true;
+
+        // position and point the camera to the center of the scene
+        camera.position.x = 0;
+        camera.position.y = 100;
+        camera.position.z = 150;
+        camera.lookAt(new THREE.Vector3(0, 20, 0));
+
+        // add spotlight for the shadows
+        /*var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(150, 150, 150);
+        spotLight.intensity = 2;
+        scene.add(spotLight);*/
+
+        var ambiLight = new THREE.AmbientLight(0x111111);
+        scene.add(ambiLight);
+        var spotLight = new THREE.DirectionalLight(0xffffff);
+        spotLight.position.set(-20, 30, 40);
+        spotLight.intensity = 1.5;
+        scene.add(spotLight);
+
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
+
+        // model from http://www.thingiverse.com/thing:69709
+        var loader = new THREE.ColladaLoader();
+
+        var mesh;
+        var mesh1;
+        var mesh2;
+
+        var Mobile1 = new Mobile({
+            moveSpeed: 0.03,
+            rotationSpeed: 0.1,
+            position: {x: 0, y: 0, z: -500},
+            rotation: Math.PI / 2,
+            circleR: 500,
+            scale: 0.7
+        });
+
+        var Mobile2 = new Mobile({
+            moveSpeed: 0.02,
+            rotationSpeed: 0.2,
+            position: {x: 0, y: 0, z: -500},
+            rotation: Math.PI / 2,
+            circleR: 500,
+            scale: 0.7
+        });
+
+        var Mobile3 = new Mobile({
+            moveSpeed: 0.01,
+            rotationSpeed: 0.3,
+            position: {x: 0, y: 0, z: -500},
+            rotation: Math.PI / 2,
+            circleR: 500,
+            scale: 0.7
+        });
+
+        loader.load("m80/m80_dae.dae", function (result) {
+            Mobile1.mesh = result.scene.children[0].children[0].clone();
+            Mobile2.mesh = result.scene.children[0].children[0].clone();
+            Mobile3.mesh = result.scene.children[0].children[0].clone();
+
+            Mobile1.load();
+            Mobile2.load();
+            Mobile3.load();
+
+            scene.add(Mobile1.mesh);
+            scene.add(Mobile2.mesh);
+            scene.add(Mobile3.mesh);
+            
+            render();
+
+        });
+
+        var orbitControls = new THREE.OrbitControls(camera);
+        orbitControls.autoRotate = true;
+        var clock = new THREE.Clock();
+
+
+        var t = 0, t1 = 0, t2 = 0;
+        var circleR = 500,
+            circleR1 = 500,
+            circleR2 = 500;
+
+        function mobileAnimate(){
+            t += mStep;          
+
+            if( circleR == 500 ){
+                mesh.position.x = circleR*Math.cos(t) + 0;
+                mesh.position.z = -circleR*Math.sin(t) - circleR; 
+            }else{
+                mesh.position.x = circleR*Math.cos(t) + 0;
+                mesh.position.z = -circleR*Math.sin(t) - circleR;
+            } 
+        }
+
+        function mobileAnimate1(){
+            t1 += mStep1;  
+
+            if( circleR1 == 500 ){
+                mesh1.position.x = circleR1*Math.cos(t1) + 0;
+                mesh1.position.z = -circleR1*Math.sin(t1) - circleR1; 
+            }else{
+                mesh1.position.x = circleR1*Math.cos(t1) + 0;
+                mesh1.position.z = -circleR1*Math.sin(t1) - circleR1;
+            } 
+        }
+
+        function mobileAnimate2(){
+            t2 += mStep2;  
+
+            if( circleR2 == 500 ){
+                mesh2.position.x = circleR2*Math.cos(t2) + 0;
+                mesh2.position.z = -circleR2*Math.sin(t2) - circleR2; 
+            }else{
+                mesh2.position.x = circleR2*Math.cos(t2) + 0;
+                mesh2.position.z = -circleR2*Math.sin(t2)  - circleR2;
+            }
+            
+        }
+
+        function render() {
+            stats.update();
+
+            Mobile1.animate();
+            Mobile2.animate();
+            Mobile3.animate();
+
+            if( Math.ceil(Mobile1.mesh.position.z) == 0 ){
+                Mobile1.circleR = 300;
+            }
+
+            if( Math.ceil(Mobile2.mesh.position.z) == 0 ){
+                Mobile1.moveSpeed = 0.01;
+                Mobile2.moveSpeed = 0.01;
+                Mobile2.circleR = 300;
+            }
+
+            if( Math.ceil(Mobile3.mesh.position.z) == 0 ){
+                Mobile3.circleR = 300;
+            }
+
+            // var delta = clock.getDelta();
+            // orbitControls.update(delta);
+            
+            // render using requestAnimationFrame
+            requestAnimationFrame(render);
+            webGLRenderer.render(scene, camera);
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+
+    function Mobile(obj){
+        this.moveSpeed = obj.moveSpeed;  //移动速度
+        this.rotationSpeed = obj.rotationSpeed;     //旋转速度
+        this.position = obj.position;    //初始位置
+        this.rotation = obj.rotation;    //初始旋转角度
+        this.circleR = obj.circleR;      //半径
+        this.scale = obj.scale;     //缩放大小
+
+        this.t = 0;
+
+        Mobile.prototype.load = function(){
+            this.mesh.scale.set(this.scale, this.scale, this.scale);
+            this.mesh.position.set(this.position.x, this.position.y, this.position.z);
+            this.mesh.rotation.x = this.rotation;
+        }
+
+        Mobile.prototype.animate = function(){
+            this.t += this.moveSpeed;          
+
+            if( this.circleR == 500 ){
+                this.mesh.position.x = this.circleR*Math.cos(this.t) + 0;
+                this.mesh.position.z = -this.circleR*Math.sin(this.t) - this.circleR; 
+            }else{
+                this.mesh.position.x = this.circleR*Math.cos(this.t) + 0;
+                this.mesh.position.z = -this.circleR*Math.sin(this.t) - this.circleR;
+            }
+        }
+
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

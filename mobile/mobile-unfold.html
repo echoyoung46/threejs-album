@@ -69,9 +69,10 @@
         //     });
         // });
         var mobile = new Mobile();
-        var mesh = mobile.init();
-        console.log('new');
-        console.log(mesh);
+        mobile.init();
+
+        setInterval(function(){console.log(mobile)},2000);
+        
 
         // scene.add(mobile);
         render();

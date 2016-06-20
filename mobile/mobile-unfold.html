@@ -3,14 +3,16 @@
 <html>
 
 <head>
-    <title>m86 solo</title>
+    <title>m86 unfold</title>
     <script type="text/javascript" src="../libs/three.js"></script>
     <script type="text/javascript" src="../libs/ColladaLoader.js"></script>
 
     <script type="text/javascript" src="../libs/stats.js"></script>
     <script type="text/javascript" src="../libs/dat.gui.js"></script>
     <script src="../libs/OrbitControls.js"></script>
+    <script src="../libs/TweenMax.min.js"></script>
     <script src="js/mobile.js"></script>
+    <script src="js/mobile-unfold.js"></script>
     <style>
         body {
             margin: 0;
@@ -24,93 +26,5 @@
 </div>
 <div id="WebGL-output">
 </div>
-
-<script type="text/javascript">
-
-    function init() {
-
-        var stats = initStats();
-
-        var scene = new THREE.Scene();
-
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-        var webGLRenderer = new THREE.WebGLRenderer();
-        webGLRenderer.setClearColor(new THREE.Color(0xcccccc, 1.0));
-        webGLRenderer.setSize(window.innerWidth, window.innerHeight);
-        webGLRenderer.shadowMapEnabled = true;
-
-        camera.position.x = 150;
-        camera.position.y = 150;
-        camera.position.z = 150;
-        camera.lookAt(new THREE.Vector3(0, 20, 0));
-
-        var spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(150, 150, 150);
-        spotLight.intensity = 2;
-        scene.add(spotLight);
-
-        document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
-
-        // var loader = new THREE.ColladaLoader();
-        // var mesh = null;
-
-        // loader.load("./models/m80/m80_dae.dae", function (result) {
-        //     var geom = result.scene.children[0].children[0].geometry;
-
-        //     var texture = THREE.ImageUtils.loadTexture('models/m80/m80_map.jpg', {}, function() {
-        //         var mat = new THREE.MeshLambertMaterial();
-        //         mat.map = texture;
-        //         mesh = new THREE.Mesh(geom, mat);
-        //         mesh.scale.set(0.3, 0.3, 0.3);
-                
-        //         scene.add(mesh);                
-        //         render();
-        //     });
-        // });
-        var mobile = new Mobile();
-        mobile.init();
-
-        setInterval(function(){console.log(mobile)},2000);
-        
-
-        // scene.add(mobile);
-        render();
-
-        var orbitControls = new THREE.OrbitControls(camera);
-        orbitControls.autoRotate = true;
-        var clock = new THREE.Clock();
-
-        function render() {
-            stats.update();
-
-            var delta = clock.getDelta();
-            orbitControls.update(delta);
-            
-            mesh.rotation.x += 0.01;
-            mesh.rotation.y += 0.01;
-            mesh.rotation.z += 0.01;
-
-            requestAnimationFrame(render);
-            webGLRenderer.render(scene, camera);
-
-        }
-
-        function initStats() {
-
-            var stats = new Stats();
-            stats.setMode(0); 
-
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-
-            document.getElementById("Stats-output").appendChild(stats.domElement);
-
-            return stats;
-        }
-    }
-    window.onload = init;
-</script>
 </body>
 </html>

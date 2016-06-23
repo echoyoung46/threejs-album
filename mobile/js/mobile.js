@@ -5,12 +5,13 @@ function Mobile(){
 
 /** 
  * 建立手机模型、
- * _scene 场景
+ * _obj 模型的父级
+ * _pos 模型的定位和变形
+ * _aniFun 模型自带动画
  * _callback 回调函数
  */
-Mobile.prototype.init = function(_obj, _callback, _pos) {
+Mobile.prototype.init = function(_obj, _pos, _aniFun, _callback) {
     var loader = new THREE.ColladaLoader();
-
     loader.load("./models/m80/m80_dae.dae", function (result) {
         var geom = result.scene.children[0].children[0].geometry;
 
@@ -25,10 +26,8 @@ Mobile.prototype.init = function(_obj, _callback, _pos) {
             this.mesh.rotation.x = _pos.rotate.x;
             this.mesh.rotation.y = _pos.rotate.y;
             this.mesh.rotation.z = _pos.rotate.z;
-            
-            TweenMax.from(this.mesh.rotation, 3, {x:toRad(-45), y:toRad(-45), z:toRad(-45), yoyo:true, repeat:-1, repeatDelay:2});
-            TweenMax.from(this.mesh.position, 3, {x:toRad(-45), y:toRad(-45), z:toRad(-45), yoyo:true, repeat:-1, repeatDelay:2});
 
+            _aniFun(this.mesh);
             _obj.add(this.mesh);
             _callback();
         });

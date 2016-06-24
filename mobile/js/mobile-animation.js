@@ -1,8 +1,8 @@
 var group = new THREE.Object3D(),
 	scene = new THREE.Scene(),
     stats = null, camera = null, webGLRenderer = null, 
-    orbitControls = null, clock = null,
-    triangleAnimation = null;
+    orbitControls = null, clock = null;
+    
     
 
 function init() {
@@ -16,8 +16,8 @@ function init() {
     webGLRenderer.shadowMapEnabled = true;
 
     camera.position.x = 0;
-    camera.position.y = 50;
-    camera.position.z = 150;
+    camera.position.y = 30;
+    camera.position.z = 350;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     var spotLight = new THREE.AmbientLight(0xffffff);
@@ -80,6 +80,10 @@ var initStats = function() {
     return stats;
 }
 
+var triangleAnimation = null, curveAnimation = null;
+
+var curveAngle = 0, curve_radius = 0.1;
+
 var render = function() {
     stats.update();
 
@@ -92,6 +96,10 @@ var render = function() {
 
     triangleAnimation = new Animation(group);
     triangleAnimation.rotate('y', 0.01);
+    if(group.rotation.y > 9){
+        TweenMax.to(group, 5, {bezier:[{x:100, zy:250}, {x:300, z:0}, {x:500, z:400}], ease:Power1.easeInOut});
+    }
+    
 
     requestAnimationFrame(render);
     webGLRenderer.render(scene, camera);
@@ -99,55 +107,38 @@ var render = function() {
 }
 
 var number_of_triangle = 3,
-    p_radius = 20;
+    p_radius = 15;
 
-var points = [
-    {x: 0, y:0, z:-2*p_radius*Math.sin(60)+20*Math.tan(30)},
-    {x: -20, y:0, z:20*Math.tan(30)},
-    {x: 20, y:0, z:20*Math.tan(30)}
-];
-// var initTriangle = function() {
-//     for( var i = 0; i < points.length; i++ ) {
-//         var ang = 180 /  points.length * i;
-//         var pos = points[i];
-//         console.log(pos);
-//         // if( i == 0 ){
-//         //     pos = {x: 0, y: 0, z: 0};
-//         // }
-//         if( i == 1 ){
-//             ang += 180;
-//         }
-//         createMobile(group, {
-//             rotate:{x:toRad(90),y:toRad(0),z:toRad(ang)}, position:{x:pos.x,y:pos.y, z:pos.z}
-//         })
-//     }
-//     scene.add(group);
-
-// }
+// var tween1 = new TWEEN.Tween(group.position).to({x: -30, y: 10, z: -30}, 3000);
+// var tween2 = new TWEEN.Tween(group.position).to({x: 40, y: 10, z: -60}, 5000);
 
 var initTriangle = function() {
     for( var i = 0; i < number_of_triangle; i++ ) {
         var ang = 180 / number_of_triangle * i;
         var pos = orbitPos( p_radius, toRad(ang) );
         if( i == 0 ){
-            pos = {x: 0, y: 0, z: 0};
+            pos.x = 0;
         }
         if( i == 1 ){
             ang += 180;
         }
-        console.log(pos);
         createMobile(group, {
             rotate:{x:toRad(90),y:toRad(0),z:toRad(ang)}, position:{x:pos.x,y:pos.y, z:pos.z}
         })
     }
     scene.add(group);
+
+    // tween1.start();
+    // tween1.chain(tween2);
 }
+
+
 
 var createMobile = function (_group, _position) {
     var mobile = new Mobile();
     var animationFun = function (_obj) {
-        // TweenMax.from(_obj.rotation, 3, {x:toRad(-45), y:toRad(-45), z:toRad(-45), yoyo:true, repeat:-1, repeatDelay:2});
-        // TweenMax.from(_obj.position, 3, {x:toRad(-45), y:toRad(-45), z:toRad(-45), yoyo:true, repeat:-1, repeatDelay:2});
+        TweenMax.from(_obj.rotation, 3, {x:toRad(-45), y:toRad(-45), z:toRad(-45), yoyo:true, repeat:0, repeatDelay:2});
+        TweenMax.from(_obj.position, 3, {x:toRad(-45), y:toRad(-45), z:toRad(-45), yoyo:true, repeat:0, repeatDelay:2});
     }
     mobile.init(_group, _position, animationFun, function(){
         render();
@@ -171,7 +162,7 @@ var orbitPos = function(radius, angle) {
   return {
     x: Math.round(Math.cos(angle) * radius),
     y: Math.sin(angle) * 0,
-    z: Math.round(-Math.sin(angle) * radius)
+    z: Math.round(-Math.sin(angle) * radius) + radius * Math.tan(toRad(30))
   };
 }
 

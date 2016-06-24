@@ -5,7 +5,6 @@ function Animation(_role) {
 Animation.prototype.rotate = function(_direction, _speed) {
     var direction = _direction || 'x',
         speed = _speed || 0.01;
-
         switch( direction ){
             case 'x':
                 this.role.rotation.x += speed;
@@ -40,4 +39,8 @@ Animation.prototype.translate = function(_direction, _speed) {
                 break;
         }
     
+}
+
+Animation.prototype.moveByPath = function() {
+
 }

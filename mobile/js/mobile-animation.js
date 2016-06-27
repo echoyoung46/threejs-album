@@ -80,9 +80,16 @@ var initStats = function() {
     return stats;
 }
 
-var triangleAnimation = null, curveAnimation = null;
+var triangleAnimation = null, lineAnimation = null;
 
 var curveAngle = 0, curve_radius = 0.1;
+
+var stringTopY = 10,
+    stringDec = 20,
+    omegaBase = 4,
+    omegaInc = 0.15,
+    swingWidth = 10,
+    swingHeight = 10;
 
 var render = function() {
     stats.update();
@@ -95,9 +102,29 @@ var render = function() {
     // group.position.x += 0.01;
 
     triangleAnimation = new Animation(group);
-    triangleAnimation.rotate('y', 0.01);
-    if(group.rotation.y > 9){
-        TweenMax.to(group, 5, {bezier:[{x:100, zy:250}, {x:300, z:0}, {x:500, z:400}], ease:Power1.easeInOut});
+    triangleAnimation.rotate('y', 0.03);
+    if(group.rotation.y > 15){
+        triangleAnimation.rotate('y', -0.03);
+
+        var threeChildrens = group.children;
+        
+        var timer = Date.now() * 0.00025;
+        
+
+        for(var i = 0; i < threeChildrens.length; i++) {
+            // var xy = pendulumXY(i, timer);
+            // threeChildrens[i].position.x = xy[0];
+            // threeChildrens[i].position.z = xy[1];
+            // console.log(xy);
+            threeChildrens[i].rotation.z = 40;
+        }
+
+        // for( var i = 0; i < threeChildrens.length; i++) {
+        //     lineAnimation = new Animation(group);
+        //     lineAnimation.lineUp({x: 0.1, z: 0.1});
+        // }
+
+        // TweenMax.to(group, 5, {bezier:[{x:100, z:250}, {x:300, z:0}, {x:500, z:400}], ease:Power1.easeInOut});
     }
     
 
@@ -109,8 +136,6 @@ var render = function() {
 var number_of_triangle = 3,
     p_radius = 15;
 
-// var tween1 = new TWEEN.Tween(group.position).to({x: -30, y: 10, z: -30}, 3000);
-// var tween2 = new TWEEN.Tween(group.position).to({x: 40, y: 10, z: -60}, 5000);
 
 var initTriangle = function() {
     for( var i = 0; i < number_of_triangle; i++ ) {
@@ -128,8 +153,6 @@ var initTriangle = function() {
     }
     scene.add(group);
 
-    // tween1.start();
-    // tween1.chain(tween2);
 }
 
 
@@ -164,6 +187,25 @@ var orbitPos = function(radius, angle) {
     y: Math.sin(angle) * 0,
     z: Math.round(-Math.sin(angle) * radius) + radius * Math.tan(toRad(30))
   };
+}
+
+function pendulumXY(i, t) {
+    // 9800 as in 9.8 in millimeters
+    // real world physics can be a bitch
+    //var g = 16000
+    //var b = 0.1
+    //var denom = (Math.sqrt(g) + b * Math.sqrt(stringTopY))
+    //var k = g / (denom * denom)
+    //var stringLen = stringTopY * Math.pow(k, i)
+    //return i * stringDec * i * stringDec;
+    //var omega = Math.sqrt(g / stringLen)
+
+    var stringLen = stringTopY - i * stringDec;
+    var omega = omegaBase + i * omegaInc;
+    var x = Math.sin(t * omega) * swingWidth;
+    var z = Math.cos(t * omega) * swingWidth;
+    // var y = stringTopY - Math.sqrt(stringLen * stringLen - x * x);
+    return [x, z];
 }
 
 window.onload = init;

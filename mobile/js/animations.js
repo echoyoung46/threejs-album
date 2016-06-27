@@ -1,5 +1,9 @@
 function Animation(_role) {
     this.role = _role;
+
+    this.end = function(){
+        this.role.rotation = null;
+    }
 }
 
 Animation.prototype.rotate = function(_direction, _speed) {
@@ -41,6 +45,19 @@ Animation.prototype.translate = function(_direction, _speed) {
     
 }
 
-Animation.prototype.moveByPath = function() {
-
+Animation.prototype.lineUp = function(_obj) {
+    var roleChildren = this.role.children;
+    for( var i = 0; i < roleChildren.length; i++) {
+        var _children = new Animation(roleChildren[i]);
+        for( var j in _obj ){
+            console.log(_children.rotation.x);
+            _children.translate(j, _obj[j]);
+        }
+        
+        
+    }
 }
+
+// Animation.translatetotype.wagTail = function() {
+
+// }

@@ -32,6 +32,7 @@ Animation.prototype.translate = function(_direction, _speed) {
         switch( direction ){
             case 'x':
                 this.role.position.x += speed;
+                // console.log(this.role.position.x);
                 break;
             case 'y':
                 this.role.position.y += speed;
@@ -46,15 +47,31 @@ Animation.prototype.translate = function(_direction, _speed) {
 }
 
 Animation.prototype.lineUp = function(_obj) {
+
     var roleChildren = this.role.children;
-    for( var i = 0; i < roleChildren.length; i++) {
-        var _children = new Animation(roleChildren[i]);
+    for( var i = 0; i < roleChildren.length; i++ ) {
+
+        var _children = roleChildren[i];
         for( var j in _obj ){
-            console.log(_children.rotation.x);
-            _children.translate(j, _obj[j]);
+            var speed = _obj[j] ;
+
+            switch( j ){
+                case 'x':
+                    _children.position.x += speed * (i + 1);
+                    break;
+                case 'y':
+                    _children.position.y += speed * (i + 1);
+                    break;
+                case 'z':
+                    if( _children.position.z > -500 ){
+                        _children.position.z += speed * (i + 1);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
-        
-        
+
     }
 }
 

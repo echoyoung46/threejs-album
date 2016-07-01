@@ -1,4 +1,5 @@
-var group = new THREE.Object3D(),
+var triGroup = new THREE.Object3D(),
+	lineGroup = new THREE.Object3D(),
 	scene = new THREE.Scene(),
     stats = null, camera = null, webGLRenderer = null, 
     orbitControls = null, clock = null;
@@ -17,7 +18,7 @@ function init() {
 
     camera.position.x = 0;
     camera.position.y = 30;
-    camera.position.z = 350;
+    camera.position.z = 150;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     var spotLight = new THREE.AmbientLight(0xffffff);
@@ -27,38 +28,12 @@ function init() {
 
     document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
 
-    // var loader = new THREE.ColladaLoader();
-    // var mesh = null;
-
-    // loader.load("./models/m80/m80_dae.dae", function (result) {
-    //     var geom = result.scene.children[0].children[0].geometry;
-
-    //     var texture = THREE.ImageUtils.loadTexture('models/m80/m80_map.jpg', {}, function() {
-    //         var mat = new THREE.MeshLambertMaterial();
-    //         mat.map = texture;
-    //         mesh = new THREE.Mesh(geom, mat);
-    //         mesh.scale.set(0.3, 0.3, 0.3);
-            
-    //         scene.add(mesh);                
-    //         render();
-    //     });
-    // });
-
-    // var mobile = new Mobile();
-    // mobile.init(group, pos, function(){
-    //     console.log('finish mobile init');
-    //     render();
-    // });
     initTriangle();
 
     orbitControls = new THREE.OrbitControls(camera);
     orbitControls.autoRotate = true;
     clock = new THREE.Clock();
 
-
-    //视角
-    // group.rotation.x = toRad(-15);
-    // group.rotation.y = toRad(-15);
 
     //保持移动
     // TweenMax.to(group.rotation, 6, { z:toRad(360), ease:Linear.easeNone, repeat:-1, overwrite:false });
@@ -96,41 +71,59 @@ var render = function() {
 
     // var delta = clock.getDelta();
     // orbitControls.update(delta);
-    
-    // group.rotation.x += 0.01;
-    // group.rotation.y += 0.01;
-    // group.position.x += 0.01;
 
-    triangleAnimation = new Animation(group);
-    triangleAnimation.rotate('y', 0.03);
-    if(group.rotation.y > 15){
-        triangleAnimation.rotate('y', -0.03);
+    if( triangleAnimation != null ){
+        triangleAnimation.rotate('y', 0.03);
+    }
 
-        var threeChildrens = group.children;
-        
-        var timer = Date.now() * 0.00025;
-        
+    if(triGroup.rotation.y > 15){
+        initLine(triGroup.children[0]);
+        triGroup.rotation.y = 0;
+        triangleAnimation = null;
+        scene.remove(triGroup);
+    }
 
-        for(var i = 0; i < threeChildrens.length; i++) {
-            // var xy = pendulumXY(i, timer);
-            // threeChildrens[i].position.x = xy[0];
-            // threeChildrens[i].position.z = xy[1];
-            // console.log(xy);
-            threeChildrens[i].rotation.z = 40;
+    if( lineAnimation != null ){
+        for( var i = 0; i < lineGroup.children.length; i++ ){
+            var _children = new Animation(lineGroup.children[i]);
+            _children.rotate('z', -0.03-0.0005*i);
+            var step = plankBob(i);
+            lineGroup.children[i].position.x = step[0];
+            wagCount++;
         }
 
-        // for( var i = 0; i < threeChildrens.length; i++) {
-        //     lineAnimation = new Animation(group);
-        //     lineAnimation.lineUp({x: 0.1, z: 0.1});
-        // }
-
-        // TweenMax.to(group, 5, {bezier:[{x:100, z:250}, {x:300, z:0}, {x:500, z:400}], ease:Power1.easeInOut});
+        if( wagCount >= 7000 ){
+            lineAnimation = null;
+            scene.remove(lineGroup);
+        }
     }
     
 
     requestAnimationFrame(render);
     webGLRenderer.render(scene, camera);
 
+}
+
+var bobRange = 0,
+    sign = -1,
+    bob_radius = 200,
+    lineArr = [5,4,3,2,1,-2,-4,-8,-12,-16,-20],
+    wagCount = 0;
+
+var plankBob = function(_i) {
+    // bob_radius += 0.1;
+    
+    if( bobRange >= 10 ){
+        sign = -1;
+    }else if( bobRange <= -10 ){
+        sign = 1;
+    }
+
+    bobRange += 0.01 * sign;
+
+    var x = bob_radius * lineArr[_i] * Math.sin(toRad(bobRange));
+    var z = bob_radius * lineArr[_i] * Math.tan(toRad(bobRange));
+    return [x,z];
 }
 
 var number_of_triangle = 3,
@@ -147,12 +140,25 @@ var initTriangle = function() {
         if( i == 1 ){
             ang += 180;
         }
-        createMobile(group, {
+        createMobile(triGroup, {
             rotate:{x:toRad(90),y:toRad(0),z:toRad(ang)}, position:{x:pos.x,y:pos.y, z:pos.z}
         })
     }
-    scene.add(group);
+    scene.add(triGroup);
+    triangleAnimation = new Animation(triGroup);
+}
 
+var initLine = function(_obj) {
+    var lineLength = 11;
+
+    for( var i = 0; i < lineLength; i++ ){
+        var mobileCopy = _obj.clone();
+        mobileCopy.position.z -= i * 100;
+        lineGroup.add(mobileCopy);
+    }
+    
+    scene.add(lineGroup);
+    lineAnimation = new Animation(lineGroup);
 }
 
 
